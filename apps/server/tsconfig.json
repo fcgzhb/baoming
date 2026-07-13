@@ -6,7 +6,8 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "baseUrl": "./",
-    "types": ["node", "jest"]
+    "types": ["node", "jest"],
+    "strictPropertyInitialization": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "test"]
