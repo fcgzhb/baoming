@@ -1,0 +1,22 @@
+{
+  "name": "baoming",
+  "version": "0.1.0",
+  "private": true,
+  "description": "旅游游学项目报名小程序平台 — WeChat mini-program (uni-app) + admin (Vue3) + backend (NestJS)",
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "install:all": "pnpm install",
+    "dev:server": "pnpm --filter @baoming/server dev",
+    "dev:admin": "pnpm --filter @baoming/admin dev",
+    "dev:mp": "pnpm --filter @baoming/mp dev:mp-weixin",
+    "build": "pnpm -r --filter \"./apps/*\" build",
+    "lint": "pnpm -r --parallel lint",
+    "test": "pnpm -r --parallel test",
+    "migration:run": "pnpm --filter @baoming/server migration:run",
+    "migration:generate": "pnpm --filter @baoming/server migration:generate",
+    "seed:admin": "pnpm --filter @baoming/server seed:admin"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  }
+}

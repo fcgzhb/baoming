@@ -1,0 +1,6 @@
+packages:
+  - 'apps/server'
+  - 'apps/admin'
+  - 'packages/*'
+# NOTE: apps/mp (uni-app) is bootstrapped separately due to @dcloudio timestamped
+# versions — see apps/mp/README.md. Once its deps are installed, add 'apps/mp' here.
