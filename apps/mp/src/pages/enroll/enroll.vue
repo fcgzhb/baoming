@@ -47,6 +47,11 @@
       </view>
     </view>
 
+    <view class="consent" @tap="agreed = !agreed">
+      <checkbox :checked="agreed" color="#409EFF" />
+      <text class="consent-text">我已阅读并同意《隐私协议》，授权采集上述参团人敏感信息用于报名</text>
+    </view>
+
     <view class="footer">
       <button class="btn primary" :disabled="submitting" @click="onSubmit">
         {{ submitting ? '提交中…' : '提交并支付' }}
@@ -68,6 +73,7 @@ const projectId = ref('');
 const title = ref('');
 const price = ref('');
 const submitting = ref(false);
+const agreed = ref(false);
 
 const form = reactive({
   name: '',
@@ -91,8 +97,23 @@ const onSubmit = async () => {
     uni.showToast({ title: '请填写姓名和证件号', icon: 'none' });
     return;
   }
+  if (!agreed.value) {
+    uni.showToast({ title: '请先同意隐私协议', icon: 'none' });
+    return;
+  }
   submitting.value = true;
   try {
+    // FR-014: record sensitive-info consent before collecting participant PII.
+    try {
+      await request({
+        url: '/mp/consent',
+        method: 'POST',
+        data: { consentType: 'sensitive_info_collection', policyVersion: '1.0' },
+      });
+    } catch {
+      // consent recording failure shouldn't block enrollment; logged server-side.
+    }
+
     const res = await request<{ orderId: string; orderNo: string; amount: string }>({
       url: '/mp/orders',
       method: 'POST',
@@ -149,6 +170,8 @@ onLoad((q) => {
 .label { width: 220rpx; color: #606266; font-size: 28rpx; flex-shrink: 0; }
 .form-row input { flex: 1; font-size: 28rpx; }
 .picker { font-size: 28rpx; }
+.consent { display: flex; align-items: flex-start; padding: 16rpx 8rpx; }
+.consent-text { font-size: 24rpx; color: #909399; margin-left: 8rpx; line-height: 1.5; }
 .footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 16rpx 24rpx; background: #fff; box-shadow: 0 -2rpx 12rpx rgba(0,0,0,0.06); }
 .btn { border-radius: 999rpx; font-size: 30rpx; }
 .btn.primary { background: #409eff; color: #fff; }

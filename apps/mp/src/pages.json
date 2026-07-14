@@ -5,6 +5,7 @@
     { "path": "pages/enroll/enroll", "style": { "navigationBarTitleText": "报名" } },
     { "path": "pages/orders/orders", "style": { "navigationBarTitleText": "我的订单" } },
     { "path": "pages/order-detail/order-detail", "style": { "navigationBarTitleText": "订单详情" } },
+    { "path": "pages/profile/profile", "style": { "navigationBarTitleText": "我的" } },
     { "path": "pages/login/login", "style": { "navigationBarTitleText": "登录" } }
   ],
   "globalStyle": {
@@ -19,7 +20,8 @@
     "backgroundColor": "#FFFFFF",
     "list": [
       { "pagePath": "pages/index/index", "text": "项目" },
-      { "pagePath": "pages/orders/orders", "text": "我的订单" }
+      { "pagePath": "pages/orders/orders", "text": "我的订单" },
+      { "pagePath": "pages/profile/profile", "text": "我的" }
     ]
   }
 }

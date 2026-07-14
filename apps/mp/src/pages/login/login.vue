@@ -1,21 +1,97 @@
 <template>
   <view class="page">
-    <view class="title">游学报名</view>
-    <button class="btn" open-type="getUserInfo" @click="onLogin">微信授权登录</button>
-    <view class="muted">登录接口 /api/mp/auth/login 将在 Phase 3 (US2) 后端联调</view>
+    <view class="logo">游学报名</view>
+    <view class="subtitle">微信授权登录后即可报名项目</view>
+
+    <button class="btn primary" :disabled="loading" @click="onLogin">
+      {{ loading ? '登录中…' : '微信授权登录' }}
+    </button>
+
+    <template v-if="token">
+      <button
+        v-if="!phone"
+        class="btn ghost"
+        open-type="getPhoneNumber"
+        @getphonenumber="onPhone"
+      >
+        授权手机号（用于联系）
+      </button>
+      <view v-else class="muted">已绑定手机号 {{ phone }}</view>
+      <button class="btn ghost" @click="goHome">进入首页</button>
+    </template>
+    <view class="muted tip">登录即代表你同意我们的服务与隐私政策</view>
   </view>
 </template>
 
 <script setup lang="ts">
-const onLogin = async () => {
-  // Placeholder: real flow uses uni.login({ provider: 'weixin' }) -> POST /mp/auth/login.
-  uni.showToast({ title: '待后端联调', icon: 'none' });
+import { ref } from 'vue';
+import { request, getToken, setToken } from '../../utils/request';
+
+const loading = ref(false);
+const token = ref(getToken());
+const phone = ref('');
+
+const onLogin = () => {
+  loading.value = true;
+  uni.login({
+    provider: 'weixin',
+    success: async (res) => {
+      try {
+        const data = await request<{ token: string; user: { phone?: string | null } }>({
+          url: '/mp/auth/login',
+          method: 'POST',
+          data: { code: res.code },
+          auth: false,
+        });
+        setToken(data.token);
+        token.value = data.token;
+        phone.value = data.user?.phone ?? '';
+        uni.showToast({ title: '登录成功', icon: 'success' });
+        // If redirected from another page (e.g. enroll), go back; else stay for phone.
+        setTimeout(() => {
+          uni.navigateBack({
+            delta: 1,
+            fail: () => uni.switchTab({ url: '/pages/index/index' }),
+          });
+        }, 600);
+      } catch {
+        // toast handled in request util (e.g. 微信登录失败 if creds missing)
+      } finally {
+        loading.value = false;
+      }
+    },
+    fail: () => {
+      loading.value = false;
+      uni.showToast({ title: '登录已取消', icon: 'none' });
+    },
+  });
 };
+
+const onPhone = async (e: { detail: { errMsg: string; code?: string } }) => {
+  if (e.detail.errMsg !== 'getPhoneNumber:ok' || !e.detail.code) return;
+  try {
+    const data = await request<{ phone: string }>({
+      url: '/mp/auth/phone',
+      method: 'POST',
+      data: { code: e.detail.code },
+    });
+    phone.value = data.phone;
+    uni.showToast({ title: '手机号已授权', icon: 'success' });
+  } catch {
+    // toast handled
+  }
+};
+
+const goHome = () => uni.switchTab({ url: '/pages/index/index' });
 </script>
 
 <style>
-.page { padding: 80rpx 40rpx; }
-.title { font-size: 44rpx; font-weight: 700; text-align: center; margin: 80rpx 0; }
-.btn { background: #07c160; color: #fff; border-radius: 999rpx; }
-.muted { color: #909399; font-size: 24rpx; margin-top: 24rpx; text-align: center; }
+.page { padding: 120rpx 48rpx; min-height: 100vh; background: #f7f8fa; }
+.logo { font-size: 52rpx; font-weight: 700; text-align: center; margin-top: 80rpx; }
+.subtitle { color: #909399; font-size: 26rpx; text-align: center; margin: 16rpx 0 80rpx; }
+.btn { margin-top: 24rpx; border-radius: 999rpx; font-size: 30rpx; }
+.btn.primary { background: #07c160; color: #fff; }
+.btn.ghost { background: #fff; color: #606266; border: 1rpx solid #dcdfe6; }
+.muted { color: #909399; font-size: 26rpx; text-align: center; margin-top: 24rpx; }
+.tip { font-size: 22rpx; margin-top: 48rpx; }
 </style>
