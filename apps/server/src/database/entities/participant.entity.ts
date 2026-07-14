@@ -16,8 +16,8 @@ export class Participant {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
   id: string;
 
-  @Column({ name: 'order_id', type: 'bigint', unsigned: true })
-  orderId: string;
+  @Column({ name: 'order_id', type: 'bigint', unsigned: true, nullable: true })
+  orderId: string | null;
 
   @Column({ type: 'varchar', length: 64 })
   name: string;

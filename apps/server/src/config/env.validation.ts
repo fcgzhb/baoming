@@ -29,6 +29,7 @@ export const envValidation = Joi.object({
   WXPAY_REFUND_NOTIFY_URL: optionalStr,
   WXPAY_CERT_SERIAL_NO: optionalStr,
   WXPAY_PRIVATE_KEY_PATH: optionalStr,
+  WXPAY_CERT_PATH: optionalStr,
   WXPAY_PLATFORM_CERT_PATH: optionalStr,
 
   SEED_ADMIN_USERNAME: Joi.string().default('admin'),
