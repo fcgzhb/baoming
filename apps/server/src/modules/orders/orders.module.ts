@@ -8,14 +8,12 @@ import { AuditLog } from '../../database/entities/audit-log.entity';
 import { PaymentModule } from '../payment/payment.module';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
+import { AdminOrdersController } from './admin-orders.controller';
 import { WechatCallbacksController } from './wechat-callbacks.controller';
 
 @Module({
-  imports: [
-    PaymentModule,
-    TypeOrmModule.forFeature([Order, Participant, Project, User, AuditLog]),
-  ],
+  imports: [PaymentModule, TypeOrmModule.forFeature([Order, Participant, Project, User, AuditLog])],
   providers: [OrdersService],
-  controllers: [OrdersController, WechatCallbacksController],
+  controllers: [OrdersController, AdminOrdersController, WechatCallbacksController],
 })
 export class OrdersModule {}

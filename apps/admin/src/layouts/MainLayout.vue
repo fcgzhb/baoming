@@ -4,6 +4,8 @@
       <div class="brand">游学报名 · 后台</div>
       <el-menu mode="horizontal" :default-active="activeMenu" router class="nav" :ellipsis="false">
         <el-menu-item index="/projects">游学项目</el-menu-item>
+        <el-menu-item index="/orders">订单</el-menu-item>
+        <el-menu-item index="/users">用户</el-menu-item>
         <el-menu-item index="/">首页</el-menu-item>
       </el-menu>
       <div class="right">
@@ -26,7 +28,12 @@ const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
 
-const activeMenu = computed(() => (route.path.startsWith('/projects') ? '/projects' : route.path));
+const activeMenu = computed(() => {
+  if (route.path.startsWith('/projects')) return '/projects';
+  if (route.path.startsWith('/orders')) return '/orders';
+  if (route.path.startsWith('/users')) return '/users';
+  return route.path;
+});
 
 const onLogout = () => {
   auth.clear();

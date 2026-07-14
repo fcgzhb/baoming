@@ -12,6 +12,7 @@ import { BusinessError } from '../../common/errors/business-error';
 import { WechatPayService } from '../payment/wechat-pay.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { QueryOrderDto } from './dto/query-order.dto';
+import { AdminQueryOrderDto } from './dto/admin-query-order.dto';
 
 const yuanToFen = (yuan: string | number): number => Math.round(Number(yuan) * 100);
 
@@ -334,5 +335,94 @@ export class OrdersService {
       }
     }
     return { checked: targets.length, updated };
+  }
+
+  // ---------- US6: admin orders ----------
+
+  async findAdminOrders(q: AdminQueryOrderDto) {
+    const page = q.page ?? 1;
+    const size = q.size ?? 20;
+    const qb = this.orders
+      .createQueryBuilder('o')
+      .leftJoin(Participant, 'part', 'part.id = o.participant_id');
+    if (q.projectId) qb.andWhere('o.project_id = :pid', { pid: q.projectId });
+    if (q.status) qb.andWhere('o.status = :st', { st: q.status });
+    if (q.orderNo) qb.andWhere('o.order_no LIKE :ono', { ono: `%${q.orderNo}%` });
+    if (q.phone) qb.andWhere('part.phone LIKE :ph', { ph: `%${q.phone}%` });
+    if (q.name) qb.andWhere('part.name LIKE :nm', { nm: `%${q.name}%` });
+    qb.orderBy('o.createdAt', 'DESC')
+      .skip((page - 1) * size)
+      .take(size);
+    const [rows, total] = await qb.getManyAndCount();
+
+    const partIds = [...new Set(rows.map((o) => o.participantId))];
+    const projIds = [...new Set(rows.map((o) => o.projectId))];
+    const [parts, projs] = await Promise.all([
+      partIds.length ? this.participants.find({ where: partIds.map((id) => ({ id })) }) : [],
+      projIds.length ? this.projects.find({ where: projIds.map((id) => ({ id })) }) : [],
+    ]);
+    const partMap = new Map(parts.map((p) => [p.id, p]));
+    const projMap = new Map(projs.map((p) => [p.id, p]));
+
+    return {
+      list: rows.map((o) => {
+        const part = partMap.get(o.participantId);
+        return {
+          id: o.id,
+          orderNo: o.orderNo,
+          projectId: o.projectId,
+          projectTitle: projMap.get(o.projectId)?.title ?? null,
+          userId: o.userId,
+          participantName: part?.name ?? null,
+          participantPhone: part?.phone ?? null,
+          participantIdCard: part?.idCard ?? null,
+          amount: o.amount,
+          status: o.status,
+          refundStatus: o.refundStatus,
+          paidAt: o.paidAt,
+          refundedAt: o.refundedAt,
+          createdAt: o.createdAt,
+        };
+      }),
+      total,
+      page,
+      size,
+    };
+  }
+
+  async findOneAdmin(id: string) {
+    const order = await this.orders.findOne({ where: { id } });
+    if (!order) throw BusinessError.notFound('订单不存在');
+    const [project, participant, user] = await Promise.all([
+      this.projects.findOne({ where: { id: order.projectId } }),
+      this.participants.findOne({ where: { id: order.participantId } }),
+      this.users.findOne({ where: { id: order.userId } }),
+    ]);
+    return {
+      ...order,
+      project,
+      participant,
+      user: user ? { id: user.id, nickname: user.nickname, phone: user.phone } : null,
+    };
+  }
+
+  /** US6: admin initiates a full refund on a confirmed order. */
+  async adminRefund(orderId: string, adminId: string) {
+    const order = await this.orders.findOne({ where: { id: orderId } });
+    if (!order) throw BusinessError.notFound('订单不存在');
+    if (order.status !== OrderStatus.CONFIRMED) {
+      throw BusinessError.conflict('仅已报名(已支付)订单可退款');
+    }
+    await this.audit.insert({
+      actorType: 'admin',
+      actorId: adminId,
+      action: 'order.refund',
+      targetType: 'order',
+      targetId: order.id,
+      amount: order.amount,
+    });
+    // Sets refundStatus=processing then calls WeChat; throws if not configured.
+    await this.initiateRefund(order);
+    return { id: order.id, status: order.status, refundStatus: RefundStatus.PROCESSING };
   }
 }

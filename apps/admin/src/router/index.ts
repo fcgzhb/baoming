@@ -13,8 +13,28 @@ const router = createRouter({
       children: [
         { path: '', name: 'home', component: () => import('../views/home.vue') },
         { path: 'projects', name: 'projects', component: () => import('../views/projects.vue') },
-        { path: 'projects/new', name: 'project-new', component: () => import('../views/project-edit.vue') },
-        { path: 'projects/:id', name: 'project-edit', component: () => import('../views/project-edit.vue') },
+        {
+          path: 'projects/new',
+          name: 'project-new',
+          component: () => import('../views/project-edit.vue'),
+        },
+        {
+          path: 'projects/:id',
+          name: 'project-edit',
+          component: () => import('../views/project-edit.vue'),
+        },
+        { path: 'orders', name: 'orders', component: () => import('../views/orders.vue') },
+        {
+          path: 'orders/:id',
+          name: 'order-detail',
+          component: () => import('../views/order-detail.vue'),
+        },
+        { path: 'users', name: 'users', component: () => import('../views/users.vue') },
+        {
+          path: 'users/:id',
+          name: 'user-detail',
+          component: () => import('../views/user-detail.vue'),
+        },
       ],
     },
   ],
