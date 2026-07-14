@@ -8,5 +8,6 @@ export class AdminLoginDto {
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(128) // bound bcrypt input size to prevent resource exhaustion
   password: string;
 }

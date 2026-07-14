@@ -35,8 +35,9 @@ export class AdminAuthService {
 
   async getMe(id: string): Promise<AdminPublic> {
     const admin = await this.admins.findOne({ where: { id } });
-    if (!admin) {
-      throw BusinessError.unauthorized();
+    // Re-check status so a disabled admin's existing token is rejected at /me.
+    if (!admin || admin.status !== 1) {
+      throw BusinessError.unauthorized('账号已被禁用');
     }
     return this.toPublic(admin);
   }

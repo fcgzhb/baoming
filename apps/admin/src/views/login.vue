@@ -26,7 +26,7 @@ import { useAuthStore } from '../stores/auth';
 const router = useRouter();
 const auth = useAuthStore();
 const loading = ref(false);
-const hint = ref('后台登录接口将在 Phase 4 (US5) 实现；当前为前端骨架。');
+const hint = ref('需先在后端执行 pnpm seed:admin 注入管理员账号。');
 const form = reactive({ username: 'admin', password: '' });
 
 const onSubmit = async () => {

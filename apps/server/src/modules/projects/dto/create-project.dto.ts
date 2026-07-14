@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUrl,
   MaxLength,
   Min,
 } from 'class-validator';
@@ -18,8 +19,7 @@ export class CreateProjectDto {
   title: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(512)
+  @IsUrl({ require_protocol: true })
   coverImageUrl?: string;
 
   @IsOptional()

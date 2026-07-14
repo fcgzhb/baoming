@@ -50,7 +50,7 @@ export class ProjectsService {
     if (dto.enrollDeadline !== undefined) {
       patch.enrollDeadline = dto.enrollDeadline ? new Date(dto.enrollDeadline) : null;
     }
-    if (dto.status !== undefined) patch.status = dto.status;
+    // NOTE: status is intentionally NOT updatable here — use publish()/offline().
     Object.assign(proj, patch);
     return this.repo.save(proj);
   }
