@@ -1,17 +1,28 @@
+import sanitizeHtml from 'sanitize-html';
+
 /**
- * Defense-in-depth HTML sanitizer for admin-authored rich text (e.g. project description).
- * Strips script/iframe/object/embed/link/meta/style tags, on* event handlers, and
- * javascript:/vbscript: protocols.
+ * Allowlist-based HTML sanitizer for admin-authored rich text (project description),
+ * rendered via mp `<rich-text>` (sandboxed) and H5.
  *
- * NOT a full sanitizer — the mp-weixin `<rich-text>` is additionally sandboxed by the
- * WeChat runtime (no JS execution). This protects the H5 build and any other client.
- * For full safety, integrate DOMPurify (jsdom) server-side in a later hardening pass.
+ * sanitize-html (htmlparser2-based, pure CJS, no jsdom) strips <script>, on* handlers,
+ * javascript:/data: URLs in href/src, <iframe>/<svg>/<form>/formaction, etc. by default;
+ * we additionally restrict to a small tag/attribute allowlist.
  */
+const OPTIONS: sanitizeHtml.IOptions = {
+  allowedTags: [
+    'p', 'br', 'strong', 'em', 'b', 'i', 'u', 'span', 'div',
+    'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'img', 'a', 'hr', 'blockquote',
+  ],
+  allowedAttributes: {
+    '*': ['class'],
+    a: ['href', 'title'],
+    img: ['src', 'alt', 'title'],
+  },
+  // sanitize-html drops javascript:/vbscript:/data: in href/src by default.
+};
+
 export function sanitizeRichText(html: string): string {
   if (!html) return html;
-  return html
-    .replace(/<\s*script[\s\S]*?<\/\s*script\s*>/gi, '')
-    .replace(/<\s*\/?\s*(script|iframe|object|embed|link|meta|style)\b[^>]*>/gi, '')
-    .replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
-    .replace(/(javascript|vbscript)\s*:/gi, '$1blocked:');
+  return sanitizeHtml(html, OPTIONS);
 }
