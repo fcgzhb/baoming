@@ -9,6 +9,7 @@
     "build:h5": "uni build",
     "build:mp-weixin": "uni build -p mp-weixin"
   },
+  "//deps-note": "@dcloudio Vue3+Vite ships ONLY as alpha-tagged versions (DCloud convention; no 'stable' tag exists — dist-tags are latest/next/vue3/alpha/nvue3). Pinned to the 'vue3' dist-tag 3.0.0-alpha-5020120260710001, the official current release and the only mutually-compatible set across all @dcloudio packages. Do NOT switch to 'latest' tags (mismatched/incompatible). Reviewers: this alpha is not a pre-release — it is the supported release channel.",
   "dependencies": {
     "@baoming/shared": "workspace:*",
     "@dcloudio/uni-app": "3.0.0-alpha-5020120260710001",
