@@ -15,6 +15,6 @@ export class ConsentRecord {
   @Column({ name: 'policy_version', type: 'varchar', length: 16 })
   policyVersion: string;
 
-  @Column({ name: 'consented_at', type: 'datetime', precision: 3 })
+  @Column({ name: 'consented_at', type: 'datetime' })
   consentedAt: Date;
 }

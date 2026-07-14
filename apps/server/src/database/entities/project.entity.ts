@@ -42,7 +42,7 @@ export class Project {
   @Column({ name: 'registered_count', type: 'int', unsigned: true, default: 0 })
   registeredCount: number;
 
-  @Column({ name: 'enroll_deadline', type: 'datetime', precision: 3, nullable: true })
+  @Column({ name: 'enroll_deadline', type: 'datetime', nullable: true })
   enrollDeadline: Date | null;
 
   @Column({ type: 'varchar', length: 16, default: ProjectStatus.DRAFT })
@@ -51,12 +51,12 @@ export class Project {
   @Column({ name: 'created_by_admin_id', type: 'bigint', unsigned: true, nullable: true })
   createdByAdminId: string | null;
 
-  @CreateDateColumn({ name: 'created_at', type: 'datetime', precision: 3 })
+  @CreateDateColumn({ name: 'created_at', type: 'datetime' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at', type: 'datetime', precision: 3 })
+  @UpdateDateColumn({ name: 'updated_at', type: 'datetime' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at', type: 'datetime', precision: 3, nullable: true })
+  @DeleteDateColumn({ name: 'deleted_at', type: 'datetime', nullable: true })
   deletedAt: Date | null;
 }

@@ -28,6 +28,6 @@ export class AuditLog {
   @Column({ type: 'json', nullable: true })
   meta: Record<string, unknown> | null;
 
-  @Column({ name: 'created_at', type: 'datetime', precision: 3 })
+  @Column({ name: 'created_at', type: 'datetime' })
   createdAt: Date;
 }

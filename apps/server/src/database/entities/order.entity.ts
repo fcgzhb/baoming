@@ -46,7 +46,7 @@ export class Order {
   @Column({ type: 'varchar', length: 16, default: OrderStatus.PENDING })
   status: OrderStatus;
 
-  @Column({ name: 'paid_at', type: 'datetime', precision: 3, nullable: true })
+  @Column({ name: 'paid_at', type: 'datetime', nullable: true })
   paidAt: Date | null;
 
   @Column({ name: 'transaction_id', type: 'varchar', length: 64, nullable: true })
@@ -61,10 +61,10 @@ export class Order {
   @Column({ name: 'refund_status', type: 'varchar', length: 16, nullable: true })
   refundStatus: RefundStatus | null;
 
-  @Column({ name: 'refunded_at', type: 'datetime', precision: 3, nullable: true })
+  @Column({ name: 'refunded_at', type: 'datetime', nullable: true })
   refundedAt: Date | null;
 
-  @Column({ name: 'cancelled_at', type: 'datetime', precision: 3, nullable: true })
+  @Column({ name: 'cancelled_at', type: 'datetime', nullable: true })
   cancelledAt: Date | null;
 
   @Column({
@@ -78,9 +78,9 @@ export class Order {
   })
   activeKey: string | null;
 
-  @CreateDateColumn({ name: 'created_at', type: 'datetime', precision: 3 })
+  @CreateDateColumn({ name: 'created_at', type: 'datetime' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at', type: 'datetime', precision: 3 })
+  @UpdateDateColumn({ name: 'updated_at', type: 'datetime' })
   updatedAt: Date;
 }

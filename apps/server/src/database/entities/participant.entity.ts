@@ -46,7 +46,7 @@ export class Participant {
   @Column({ type: 'varchar', length: 255, nullable: true })
   remark: string | null;
 
-  @CreateDateColumn({ name: 'created_at', type: 'datetime', precision: 3 })
+  @CreateDateColumn({ name: 'created_at', type: 'datetime' })
   createdAt: Date;
 
   @ManyToOne(() => Order)
