@@ -7,6 +7,7 @@ import { BusinessError } from '../../common/errors/business-error';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { QueryProjectDto } from './dto/query-project.dto';
+import { sanitizeRichText } from '../../common/utils/sanitize';
 
 @Injectable()
 export class ProjectsService {
@@ -16,7 +17,7 @@ export class ProjectsService {
     const proj = this.repo.create({
       title: dto.title,
       coverImageUrl: dto.coverImageUrl ?? null,
-      description: dto.description ?? null,
+      description: dto.description ? sanitizeRichText(dto.description) : null,
       itinerary: dto.itinerary ?? null,
       departureDate: dto.departureDate ?? null,
       returnDate: dto.returnDate ?? null,
@@ -36,7 +37,9 @@ export class ProjectsService {
     const patch: DeepPartial<Project> = {};
     if (dto.title !== undefined) patch.title = dto.title;
     if (dto.coverImageUrl !== undefined) patch.coverImageUrl = dto.coverImageUrl;
-    if (dto.description !== undefined) patch.description = dto.description;
+    if (dto.description !== undefined) {
+      patch.description = dto.description ? sanitizeRichText(dto.description) : null;
+    }
     if (dto.itinerary !== undefined) patch.itinerary = dto.itinerary;
     if (dto.departureDate !== undefined) patch.departureDate = dto.departureDate;
     if (dto.returnDate !== undefined) patch.returnDate = dto.returnDate;
