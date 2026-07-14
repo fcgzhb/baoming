@@ -1,0 +1,32 @@
+# docker compose up --build
+# Server reads apps/server/.env (env_file). For the container to reach a MySQL on the
+# host, set DB_HOST=host.docker.internal (Docker Desktop) or the host LAN IP.
+services:
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    image: baoming-server
+    env_file:
+      - apps/server/.env
+    environment:
+      # Force container-friendly defaults; override via apps/server/.env
+      - NODE_ENV=production
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    # If your MySQL runs on the host, the container needs to reach it:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+    image: baoming-admin
+    ports:
+      - "5173:80"
+    depends_on:
+      - server
+    restart: unless-stopped

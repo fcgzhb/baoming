@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Post,
-  UploadedFile,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Get, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { CosService } from './cos.service';
@@ -36,5 +30,11 @@ export class UploadController {
     const key = buildObjectKey(file.originalname, file.mimetype);
     const result = await this.cos.upload(file.buffer, key, file.mimetype);
     return { url: result.url };
+  }
+
+  /** Scoped STS temp credentials for browser direct upload to COS (production pattern). */
+  @Get('sts-credentials')
+  stsCredentials() {
+    return this.cos.getUploadCredentials();
   }
 }

@@ -1,0 +1,16 @@
+**/node_modules
+**/dist
+**/build
+**/.turbo
+**/coverage
+**/.env
+**/.env.*
+!**/.env.example
+.git
+.github
+.specify
+.vscode
+.idea
+**/.DS_Store
+apps/mp/dist
+apps/mp/node_modules
