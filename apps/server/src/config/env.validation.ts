@@ -37,4 +37,9 @@ export const envValidation = Joi.object({
   SEED_ADMIN_DISPLAY_NAME: Joi.string().default('超管'),
 
   UPLOAD_DRIVER: Joi.string().valid('local', 'cos').default('local'),
+
+  COS_SECRET_ID: optionalStr,
+  COS_SECRET_KEY: optionalStr,
+  COS_BUCKET: optionalStr, // e.g. baoming-1254292923
+  COS_REGION: optionalStr, // e.g. ap-beijing
 });

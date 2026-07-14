@@ -5,8 +5,16 @@
       <el-form-item label="标题" required>
         <el-input v-model="form.title" maxlength="128" />
       </el-form-item>
-      <el-form-item label="封面图 URL">
-        <el-input v-model="form.coverImageUrl" placeholder="https://..." />
+      <el-form-item label="封面图">
+        <el-upload
+          :show-file-list="false"
+          :before-upload="onCoverUpload"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+        >
+          <img v-if="form.coverImageUrl" :src="form.coverImageUrl" class="cover-preview" />
+          <el-button v-else :loading="uploading">点击上传封面</el-button>
+        </el-upload>
+        <el-input v-model="form.coverImageUrl" placeholder="或直接填写图片 URL" style="margin-top: 8px" />
       </el-form-item>
       <el-form-item label="价格(元)" required>
         <el-input-number v-model="form.price" :min="0" :precision="2" />
@@ -45,12 +53,33 @@ import { computed, onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { createProject, getProject, updateProject } from '../api/projects';
+import { uploadImage } from '../api/upload';
 
 const route = useRoute();
 const router = useRouter();
 const isEdit = computed(() => !!route.params.id);
 const loading = ref(false);
 const saving = ref(false);
+const uploading = ref(false);
+
+// el-upload before-upload: return false to stop auto-upload (we upload via our API).
+const onCoverUpload = async (file: File) => {
+  if (file.size > 5 * 1024 * 1024) {
+    ElMessage.warning('图片不能超过 5MB');
+    return false;
+  }
+  uploading.value = true;
+  try {
+    const res = await uploadImage(file);
+    form.coverImageUrl = res.url;
+    ElMessage.success('封面上传成功');
+  } catch {
+    // toast handled in interceptor
+  } finally {
+    uploading.value = false;
+  }
+  return false;
+};
 
 const form = reactive({
   title: '',
@@ -118,4 +147,5 @@ const onSave = async () => {
 
 <style scoped>
 .muted { color: #909399; font-size: 13px; }
+.cover-preview { max-width: 240px; max-height: 140px; border-radius: 8px; object-fit: cover; }
 </style>
