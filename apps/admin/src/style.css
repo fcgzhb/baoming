@@ -1,9 +1,102 @@
+:root {
+  /* Brand palette */
+  --bm-primary: #2563eb;
+  --bm-primary-light: #4f8bff;
+  --bm-accent: #ff5a36;
+  --bg: #f3f5f9;
+  --card: #ffffff;
+  --text: #1f2937;
+  --text-2: #6b7280;
+  --muted: #9ca3af;
+  --line: #eef1f6;
+  --radius: 14px;
+
+  /* Element Plus theme overrides */
+  --el-color-primary: #2563eb;
+  --el-color-primary-light-3: #5b8def;
+  --el-color-primary-light-5: #8aabf5;
+  --el-color-primary-light-7: #c4d4fb;
+  --el-color-primary-light-8: #e1ebfd;
+  --el-color-primary-light-9: #eff5fe;
+  --el-color-primary-dark-2: #1d4fd4;
+  --el-border-radius-base: 8px;
+  --el-box-shadow: 0 1px 3px rgba(31, 41, 55, 0.04), 0 1px 2px rgba(31, 41, 55, 0.06);
+  --el-box-shadow-light: 0 4px 16px rgba(31, 41, 55, 0.06);
+}
+
 html,
 body,
 #app {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Helvetica Neue', Arial,
-    sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
+
+* { box-sizing: border-box; }
+
+/* Thin, modern scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #d4d9e3; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #b8bfcc; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* Reusable layout helpers */
+.bm-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.bm-pager { margin-top: 18px; justify-content: flex-end; display: flex; }
+
+/* Card-style page header */
+.bm-page-header {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.bm-page-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.bm-page-title .el-icon { color: var(--bm-primary); }
+
+/* Stat chips on dashboard */
+.bm-stat {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--el-box-shadow-light);
+}
+.bm-stat-label { color: var(--text-2); font-size: 13px; }
+.bm-stat-val { font-size: 30px; font-weight: 800; margin-top: 8px; color: var(--text); }
+
+/* Rounded el-table + el-card to match */
+.el-table,
+.el-card {
+  border-radius: var(--radius) !important;
+}
+.el-table { overflow: hidden; }
+.el-table th.el-table__cell {
+  background: #f7f9fc !important;
+  color: var(--text-2) !important;
+  font-weight: 600;
+}
+.el-button.is-round { border-radius: 999px; }
+
+/* Slightly softer primary buttons */
+.el-button--primary {
+  background: var(--bm-primary);
+  border-color: var(--bm-primary);
+}
+.el-button--primary:hover { background: var(--bm-primary-light); border-color: var(--bm-primary-light); }
