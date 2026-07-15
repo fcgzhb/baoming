@@ -94,12 +94,17 @@ body,
 }
 .el-button.is-round { border-radius: 999px; }
 
-/* Slightly softer primary buttons */
-.el-button--primary {
+/* Slightly softer primary buttons — ONLY solid variant (exclude plain/link/text),
+   otherwise it forces a solid background onto plain/query buttons and the label
+   (which stays light) becomes invisible until hover. */
+.el-button--primary:not(.is-plain):not(.is-link):not(.is-text) {
   background: var(--bm-primary);
   border-color: var(--bm-primary);
 }
-.el-button--primary:hover { background: var(--bm-primary-light); border-color: var(--bm-primary-light); }
+.el-button--primary:not(.is-plain):not(.is-link):not(.is-text):hover {
+  background: var(--bm-primary-light);
+  border-color: var(--bm-primary-light);
+}
 
 /* el-button with a leading <el-icon>: ensure icon and text are spaced and both visible. */
 .el-button > .el-icon + span,
