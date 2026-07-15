@@ -100,3 +100,22 @@ body,
   border-color: var(--bm-primary);
 }
 .el-button--primary:hover { background: var(--bm-primary-light); border-color: var(--bm-primary-light); }
+
+/* el-button with a leading <el-icon>: ensure icon and text are spaced and both visible. */
+.el-button > .el-icon + span,
+.el-button > span + .el-icon {
+  margin-left: 6px;
+}
+/* When a button contains ONLY text after an icon, the icon needs display:inline-flex
+   and the text must not collapse. Belt-and-suspenders for the "text invisible until hover" issue. */
+.el-button .el-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+/* link buttons (table actions) keep readable spacing too */
+.el-button.is-link > .el-icon + span,
+.el-button.is-link > span + .el-icon {
+  margin-left: 4px;
+}

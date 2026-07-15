@@ -18,7 +18,9 @@
       <el-table-column label="订单数" width="100" align="center">
         <template #default="{ row }"><el-tag type="info" effect="plain" round>{{ row.orderCount }}</el-tag></template>
       </el-table-column>
-      <el-table-column prop="createdAt" label="注册时间" width="180" />
+      <el-table-column label="注册时间" width="180">
+        <template #default="{ row }">{{ formatDateTime(row.createdAt) }}</template>
+      </el-table-column>
       <el-table-column label="操作" width="100" fixed="right" align="center">
         <template #default="{ row }"><el-button link type="primary" @click="$router.push(`/users/${row.id}`)">详情</el-button></template>
       </el-table-column>
@@ -40,6 +42,7 @@
 import { onMounted, reactive, ref } from 'vue';
 import { Search, User } from '@element-plus/icons-vue';
 import { listUsers, type AdminUser } from '../api/users';
+import { formatDateTime } from '../utils/format';
 
 const list = ref<AdminUser[]>([]);
 const total = ref(0);

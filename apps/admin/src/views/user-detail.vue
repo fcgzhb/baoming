@@ -14,7 +14,7 @@
           <el-divider />
           <div class="profile-meta">
             <div class="pm-row"><span class="pm-label">用户 ID</span><span>{{ user.id }}</span></div>
-            <div class="pm-row"><span class="pm-label">注册时间</span><span>{{ user.createdAt }}</span></div>
+            <div class="pm-row"><span class="pm-label">注册时间</span><span>{{ formatDateTime(user.createdAt) }}</span></div>
             <div class="pm-row"><span class="pm-label">订单总数</span><span class="pm-count">{{ user.orderCount }}</span></div>
           </div>
         </el-card>
@@ -27,7 +27,9 @@
             <el-table-column prop="orderNo" label="订单号" min-width="180" show-overflow-tooltip />
             <el-table-column label="金额" width="100"><template #default="{ row }">¥{{ row.amount }}</template></el-table-column>
             <el-table-column prop="status" label="状态" width="100" />
-            <el-table-column prop="createdAt" label="创建时间" width="180" />
+            <el-table-column label="创建时间" width="180">
+              <template #default="{ row }">{{ formatDateTime(row.createdAt) }}</template>
+            </el-table-column>
           </el-table>
         </el-card>
       </el-col>
@@ -40,6 +42,7 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { User } from '@element-plus/icons-vue';
 import { getUser, type AdminUser } from '../api/users';
+import { formatDateTime } from '../utils/format';
 
 const route = useRoute();
 const user = ref<(AdminUser & { orders: any[] }) | null>(null);

@@ -35,7 +35,9 @@
           <span v-else class="muted">-</span>
         </template>
       </el-table-column>
-      <el-table-column prop="createdAt" label="创建时间" width="170" />
+      <el-table-column label="创建时间" width="170">
+        <template #default="{ row }">{{ formatDateTime(row.createdAt) }}</template>
+      </el-table-column>
       <el-table-column label="操作" width="170" fixed="right" align="center">
         <template #default="{ row }">
           <el-button link type="primary" @click="$router.push(`/orders/${row.id}`)">详情</el-button>
@@ -69,6 +71,7 @@ import {
   type AdminOrderListQuery,
 } from '../api/orders';
 import type { OrderStatus, RefundStatus } from '@baoming/shared';
+import { formatDateTime } from '../utils/format';
 
 const list = ref<AdminOrder[]>([]);
 const total = ref(0);

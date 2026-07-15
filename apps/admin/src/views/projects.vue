@@ -30,7 +30,9 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="enrollDeadline" label="报名截止" width="170" />
+      <el-table-column label="报名截止" width="170">
+        <template #default="{ row }">{{ formatDateTime(row.enrollDeadline) }}</template>
+      </el-table-column>
       <el-table-column label="操作" width="280" fixed="right" align="center">
         <template #default="{ row }">
           <el-button link type="primary" @click="goEdit(row.id)"><el-icon><Edit /></el-icon>编辑</el-button>
@@ -69,6 +71,7 @@ import {
   type ProjectListQuery,
 } from '../api/projects';
 import type { ProjectStatus } from '@baoming/shared';
+import { formatDateTime } from '../utils/format';
 
 const router = useRouter();
 const list = ref<Project[]>([]);

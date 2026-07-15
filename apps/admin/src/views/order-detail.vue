@@ -19,12 +19,12 @@
             <el-descriptions-item label="金额"><span class="price">¥{{ order.amount }}</span></el-descriptions-item>
             <el-descriptions-item label="项目">{{ order.project?.title }}</el-descriptions-item>
             <el-descriptions-item label="报名用户">{{ order.user?.nickname }} ({{ order.user?.phone }})</el-descriptions-item>
-            <el-descriptions-item label="支付时间">{{ order.paidAt || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="创建时间">{{ order.createdAt }}</el-descriptions-item>
+            <el-descriptions-item label="支付时间">{{ formatDateTime(order.paidAt) }}</el-descriptions-item>
+            <el-descriptions-item label="创建时间">{{ formatDateTime(order.createdAt) }}</el-descriptions-item>
             <el-descriptions-item v-if="order.refundStatus" label="退款状态">
               {{ REFUND_STATUS_LABEL[order.refundStatus as RefundStatus] }}
             </el-descriptions-item>
-            <el-descriptions-item v-if="order.refundedAt" label="退款时间">{{ order.refundedAt }}</el-descriptions-item>
+            <el-descriptions-item v-if="order.refundedAt" label="退款时间">{{ formatDateTime(order.refundedAt) }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
 
@@ -70,6 +70,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { Document, RefreshLeft } from '@element-plus/icons-vue';
 import { OrderStatusLabel, REFUND_STATUS_LABEL, getOrder, refundOrder, type AdminOrder } from '../api/orders';
 import type { OrderStatus, RefundStatus } from '@baoming/shared';
+import { formatDateTime } from '../utils/format';
 
 const route = useRoute();
 const order = ref<(AdminOrder & { project?: any; participant?: any; user?: any }) | null>(null);
