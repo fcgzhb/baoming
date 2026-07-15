@@ -1,25 +1,38 @@
 <template>
   <view class="page">
-    <scroll-view scroll-x class="tabs">
-      <text
+    <scroll-view scroll-x class="tabs" :show-scrollbar="false">
+      <view
         v-for="t in tabs"
         :key="t.value"
         class="tab"
         :class="{ active: current === t.value }"
         @click="switchTab(t.value)"
-        >{{ t.label }}</text
       >
-    </scroll-view>
-    <view v-if="loading" class="muted">加载中…</view>
-    <view v-else-if="orders.length === 0" class="muted">暂无订单</view>
-    <view v-for="o in orders" :key="o.id" class="card" @click="goDetail(o.id)">
-      <view class="row">
-        <text class="title">{{ o.projectTitle || '游学项目' }}</text>
-        <text class="status">{{ statusLabel(o.status) }}</text>
+        {{ t.label }}
       </view>
-      <view class="row">
-        <text class="amount">¥{{ o.amount }}</text>
-        <text class="muted">{{ o.orderNo }}</text>
+    </scroll-view>
+
+    <view class="list">
+      <view v-if="loading" class="state">加载中…</view>
+      <view v-else-if="orders.length === 0" class="state empty">
+        <text class="empty-emoji">📋</text>
+        <text>暂无订单</text>
+      </view>
+
+      <view v-for="o in orders" :key="o.id" class="o-card" @click="goDetail(o.id)">
+        <view class="o-head">
+          <text class="o-project">{{ o.projectTitle || '游学项目' }}</text>
+          <text class="tag" :class="statusTag(o.status)">{{ statusLabel(o.status) }}</text>
+        </view>
+        <view class="o-body">
+          <view class="o-price">
+            <text class="o-cur">¥</text><text class="o-num">{{ o.amount }}</text>
+          </view>
+          <text class="o-no muted">订单号 {{ o.orderNo }}</text>
+        </view>
+        <view v-if="o.status === 'pending'" class="o-foot">
+          <text class="o-warn">待支付 · 名额有限请尽快</text>
+        </view>
       </view>
     </view>
   </view>
@@ -51,6 +64,14 @@ const orders = ref<Order[]>([]);
 const loading = ref(false);
 
 const statusLabel = (s: OrderStatus) => OrderStatusLabel[s] ?? s;
+const statusTag = (s: OrderStatus): string => {
+  switch (s) {
+    case 'confirmed': return 'tag-success';
+    case 'refunded': return 'tag-muted';
+    case 'cancelled': return 'tag-muted';
+    default: return 'tag-warning';
+  }
+};
 
 const load = async () => {
   loading.value = true;
@@ -76,14 +97,46 @@ onShow(() => load());
 </script>
 
 <style>
-.page { padding: 0 0 24rpx; min-height: 100vh; background: #f7f8fa; }
-.tabs { white-space: nowrap; padding: 16rpx 24rpx; background: #fff; }
-.tab { display: inline-block; padding: 8rpx 24rpx; margin-right: 16rpx; font-size: 26rpx; color: #606266; border-radius: 999rpx; background: #f0f2f5; }
-.tab.active { background: #409eff; color: #fff; }
-.card { background: #fff; margin: 16rpx 24rpx; padding: 24rpx; border-radius: 16rpx; }
-.row { display: flex; justify-content: space-between; align-items: center; }
-.title { font-size: 30rpx; font-weight: 600; }
-.status { font-size: 24rpx; color: #409eff; }
-.amount { color: #f56c6c; font-size: 32rpx; margin-top: 12rpx; }
-.muted { color: #909399; font-size: 22rpx; }
+.page { padding-bottom: 40rpx; }
+
+.tabs { white-space: nowrap; padding: 24rpx 28rpx 12rpx; }
+.tab {
+  display: inline-block;
+  padding: 14rpx 36rpx;
+  margin-right: 16rpx;
+  font-size: 27rpx;
+  color: var(--text-2);
+  background: #fff;
+  border-radius: 999rpx;
+  box-shadow: var(--shadow);
+  transition: all 0.2s;
+}
+.tab.active {
+  background: var(--primary-grad);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 6rpx 16rpx rgba(37, 99, 235, 0.3);
+}
+
+.list { padding: 12rpx 28rpx 0; }
+.state { text-align: center; color: var(--muted); padding: 100rpx 0; font-size: 28rpx; }
+.empty { display: flex; flex-direction: column; align-items: center; gap: 16rpx; }
+.empty-emoji { font-size: 72rpx; }
+
+.o-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+}
+.o-head { display: flex; justify-content: space-between; align-items: center; }
+.o-project { font-size: 31rpx; font-weight: 700; color: var(--text); flex: 1; margin-right: 16rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.o-body { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20rpx; }
+.o-price { color: var(--accent); display: flex; align-items: baseline; }
+.o-cur { font-size: 24rpx; }
+.o-num { font-size: 38rpx; font-weight: 800; }
+.o-no { font-size: 22rpx; }
+.o-foot { margin-top: 20rpx; padding-top: 18rpx; border-top: 1rpx dashed var(--line); }
+.o-warn { color: var(--warning); font-size: 24rpx; }
 </style>

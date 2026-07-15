@@ -1,25 +1,53 @@
 <template>
   <view class="page" v-if="p">
-    <image v-if="p.coverImageUrl" class="cover" :src="p.coverImageUrl" mode="aspectFill" />
-    <view class="info">
-      <text class="title">{{ p.title }}</text>
-      <view class="row">
-        <text class="price">¥{{ p.price }}</text>
-        <text class="quota">余 {{ p.remainingQuota }} 名额</text>
+    <view class="hero">
+      <image v-if="p.coverImageUrl" class="cover" :src="p.coverImageUrl" mode="aspectFill" />
+      <view v-else class="cover cover-fallback"><text>游学</text></view>
+      <view class="hero-mask" />
+      <view class="hero-titlewrap">
+        <text class="hero-title">{{ p.title }}</text>
       </view>
-      <view class="meta">出发 {{ p.departureDate || '-' }} ~ 返回 {{ p.returnDate || '-' }}</view>
-      <view class="meta">报名截止：{{ fmt(p.enrollDeadline) }}</view>
+    </view>
 
+    <view class="price-card">
+      <view class="price">
+        <text class="price-cur">¥</text>
+        <text class="price-num">{{ p.price }}</text>
+        <text class="price-unit">/ 人</text>
+      </view>
+      <view class="meta-row">
+        <view class="meta-item">
+          <text class="meta-label">出发</text>
+          <text class="meta-val">{{ p.departureDate || '-' }}</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-label">返回</text>
+          <text class="meta-val">{{ p.returnDate || '-' }}</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-label">余位</text>
+          <text class="meta-val" :class="{ 'text-accent': p.remainingQuota > 0 }">{{ p.remainingQuota }}</text>
+        </view>
+      </view>
+      <view class="deadline">报名截止：{{ fmt(p.enrollDeadline) }}</view>
+    </view>
+
+    <view class="section card">
       <view class="section-title">图文介绍</view>
-      <rich-text class="rich" :nodes="p.description || '<暂无介绍>'" />
+      <rich-text class="rich" :nodes="p.description || '<p class=&quot;muted&quot;>暂无介绍</p>'" />
+    </view>
 
+    <view class="section card">
       <view class="section-title">行程安排</view>
-      <text class="content">{{ p.itinerary || '暂无' }}</text>
+      <text class="itinerary">{{ p.itinerary || '暂无行程信息' }}</text>
     </view>
 
     <view class="footer">
-      <button v-if="p.enrollable" class="btn primary" @click="onEnroll">立即报名</button>
-      <button v-else class="btn disabled" disabled>{{ disabledText }}</button>
+      <view class="footer-price">
+        <text class="fp-cur">¥</text><text class="fp-num">{{ p.price }}</text>
+      </view>
+      <button v-if="p.enrollable" class="btn btn-primary cta" @click="onEnroll">立即报名</button>
+      <button v-else class="btn btn-disabled cta" disabled>{{ disabledText }}</button>
     </view>
   </view>
 </template>
@@ -27,8 +55,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { request } from '../../utils/request';
-import { getToken } from '../../utils/request';
+import { request, getToken } from '../../utils/request';
 
 interface ProjectDetail {
   id: string;
@@ -46,11 +73,9 @@ interface ProjectDetail {
 
 const p = ref<ProjectDetail | null>(null);
 
-const disabledText = computed(() => {
-  if (!p.value) return '';
-  if (p.value.remainingQuota <= 0) return '名额已满';
-  return '报名已截止';
-});
+const disabledText = computed(() =>
+  p.value && p.value.remainingQuota <= 0 ? '名额已满' : '报名已截止',
+);
 
 const fmt = (iso?: string) => (iso ? iso.replace('T', ' ').slice(0, 16) : '-');
 
@@ -60,7 +85,15 @@ const onEnroll = () => {
     uni.navigateTo({ url: '/pages/login/login' });
     return;
   }
-  uni.navigateTo({ url: '/pages/enroll/enroll?id=' + p.value!.id + '&title=' + encodeURIComponent(p.value!.title) + '&price=' + p.value!.price });
+  uni.navigateTo({
+    url:
+      '/pages/enroll/enroll?id=' +
+      p.value!.id +
+      '&title=' +
+      encodeURIComponent(p.value!.title) +
+      '&price=' +
+      p.value!.price,
+  });
 };
 
 onLoad(async (q) => {
@@ -75,19 +108,48 @@ onLoad(async (q) => {
 </script>
 
 <style>
-.page { padding-bottom: 140rpx; background: #f7f8fa; min-height: 100vh; }
-.cover { width: 100%; height: 380rpx; }
-.info { background: #fff; padding: 24rpx; }
-.title { font-size: 34rpx; font-weight: 700; }
-.row { display: flex; justify-content: space-between; align-items: center; margin-top: 12rpx; }
-.price { color: #f56c6c; font-size: 36rpx; font-weight: 600; }
-.quota { color: #909399; font-size: 24rpx; }
-.meta { color: #606266; font-size: 26rpx; margin-top: 12rpx; }
-.section-title { font-size: 30rpx; font-weight: 600; margin: 28rpx 0 12rpx; }
-.rich { font-size: 28rpx; color: #333; }
-.content { font-size: 28rpx; color: #606266; white-space: pre-wrap; }
-.footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 16rpx 24rpx; background: #fff; box-shadow: 0 -2rpx 12rpx rgba(0,0,0,0.06); }
-.btn { border-radius: 999rpx; font-size: 30rpx; }
-.btn.primary { background: #409eff; color: #fff; }
-.btn.disabled { background: #dcdfe6; color: #909399; }
+.page { padding-bottom: 160rpx; }
+
+.hero { position: relative; height: 420rpx; }
+.cover { width: 100%; height: 100%; }
+.cover-fallback {
+  background: linear-gradient(135deg, #93c5fd, #5eead4);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 56rpx; font-weight: 800; letter-spacing: 12rpx;
+}
+.hero-mask { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.55)); }
+.hero-titlewrap {
+  position: absolute; left: 36rpx; right: 36rpx; bottom: 40rpx;
+}
+.hero-title { color: #fff; font-size: 40rpx; font-weight: 800; line-height: 1.4; text-shadow: 0 2rpx 12rpx rgba(0,0,0,0.4); }
+
+.price-card {
+  margin: -36rpx 28rpx 0;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 32rpx 28rpx 28rpx;
+  position: relative;
+}
+.price { display: flex; align-items: baseline; }
+.price-cur { color: var(--accent); font-size: 28rpx; font-weight: 700; }
+.price-num { color: var(--accent); font-size: 56rpx; font-weight: 800; line-height: 1; }
+.price-unit { color: var(--muted); font-size: 24rpx; margin-left: 8rpx; }
+
+.meta-row { display: flex; margin-top: 28rpx; padding-top: 24rpx; border-top: 1rpx solid var(--line); }
+.meta-item { flex: 1; display: flex; flex-direction: column; gap: 8rpx; }
+.meta-label { color: var(--muted); font-size: 24rpx; }
+.meta-val { color: var(--text); font-size: 28rpx; font-weight: 600; }
+.text-accent { color: var(--accent); }
+.deadline { margin-top: 24rpx; color: var(--text-2); font-size: 24rpx; }
+
+.section { margin: 28rpx; }
+.rich { font-size: 28rpx; line-height: 1.7; color: var(--text); }
+.itinerary { font-size: 28rpx; line-height: 1.7; color: var(--text-2); white-space: pre-wrap; }
+
+.footer { display: flex; align-items: center; gap: 24rpx; }
+.footer-price { color: var(--accent); display: flex; align-items: baseline; }
+.fp-cur { font-size: 26rpx; }
+.fp-num { font-size: 44rpx; font-weight: 800; }
+.cta { flex: 1; }
 </style>
